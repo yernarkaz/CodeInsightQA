@@ -1,0 +1,22 @@
+repo:
+  url: 'https://github.com/vanna-ai/vanna.git'
+  branch: 'master'
+files:
+  extensions:
+    - '.py'
+    - '.ipynb'
+    - '.md'
+    - '.txt'
+  ignore:
+    - '.git'
+    - '.ipynb_checkpoints'
+    - '__pycache__'
+    - '.vscode'
+    - '.idea'
+    - '.github'
+    - 'venv'
+    - 'env'
+    - 'logs'
+    - 'data'
+    - 'output'
+
