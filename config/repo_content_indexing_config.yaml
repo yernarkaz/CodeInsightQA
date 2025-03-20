@@ -23,5 +23,8 @@ files:
     - 'env'
     - 'logs'
     - 'data'
+    - 'img'
+    - 'images'
+    - 'assets'
     - 'output'
 
