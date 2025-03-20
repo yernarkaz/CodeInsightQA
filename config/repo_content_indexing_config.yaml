@@ -7,6 +7,11 @@ files:
     - '.ipynb'
     - '.md'
     - '.txt'
+    - '.rst'
+    - '.json'
+    - '.yaml'
+    - '.yml'
+    - '.toml'
   ignore:
     - '.git'
     - '.ipynb_checkpoints'
