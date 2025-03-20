@@ -1,6 +1,7 @@
 repo:
   url: 'https://github.com/vanna-ai/vanna.git'
   branch: 'master'
+  path: './vanna'
 files:
   extensions:
     - '.py'
