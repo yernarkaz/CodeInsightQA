@@ -1,25 +1,43 @@
-from openai import OpenAI
+from openai import OpenAI, AzureOpenAI
 from pathlib import Path
 from typing import Dict, List, Tuple
 from tqdm import tqdm
 
 import numpy as np
 import faiss
-import openai
 import os
 import sys
 import time
 
 import utils
 
+
 ROOT_DIR = Path(__file__).parent.parent.parent
-config = utils.read_yaml_file(ROOT_DIR / "config/repo_content_indexing_config.yaml")
+config = utils.read_yaml_file(ROOT_DIR / "config/indexing_config.yaml")
+
+
 REPO_FOLDER_NAME = config["repo"]["folder_name"]
 GITHUB_REPO_BASE = config["repo"]["url"]
 ALLOWED_EXTENSIONS = config["files"]["extensions"]
 IGNORED_DIRS = config["files"]["ignored_dirs"]
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
+
+ENDPOINT = config["llm_azure"]["endpoint"]
+DEPLOYMENT = config["llm_azure"]["deployment"]
+SUBSCRIPTION_KEY = os.getenv(config["llm_api_key"][config["llm_endpoint_type"]])
+API_VERSION = config["llm_azure"]["api_version"]
+EMBEDDING_MODEL = config["embedding"]["model"]
+
+
+if config["llm_endpoint_type"] == "azure":
+    client = AzureOpenAI(
+        azure_endpoint=ENDPOINT,
+        api_key=SUBSCRIPTION_KEY,
+        api_version=API_VERSION,
+        azure_deployment=DEPLOYMENT,
+    )
+elif config["llm_endpoint_type"] == "openai":
+    client = OpenAI(api_key=SUBSCRIPTION_KEY)
 
 
 def is_text_file(file_path: Path) -> bool:
@@ -114,10 +132,12 @@ def split_document(document: Dict, chunk_size: int, overlap: int) -> List[Dict]:
     return chunks
 
 
-def get_embedding(client: OpenAI, text: str, model: str) -> List[float]:
+def get_embedding(client: OpenAI, text: str) -> List[float]:
 
     try:
-        response = client.embeddings.create(input=text, model=model)
+        response = client.embeddings.create(
+            input=text, model=EMBEDDING_MODEL, dimensions=1024
+        )
         return response.data[0].embedding
     except Exception as e:
         print(f"Error generating embedding: {e}")
@@ -129,9 +149,7 @@ def embed_chunks(client: OpenAI, chunks: List[Dict]) -> List[Dict]:
     for chunk in tqdm(chunks):
         text_to_embed = chunk.get("chunk_text", "")
         if text_to_embed:
-            chunk["embedding"] = get_embedding(
-                client, text_to_embed, model="text-embedding-ada-002"
-            )
+            chunk["embedding"] = get_embedding(client, text_to_embed)
         else:
             chunk["embedding"] = []
 
@@ -181,8 +199,10 @@ def query_index(
 
     query_vector = np.array(query_embedding, dtype="float32").reshape(1, -1)
     distances, indices = index.search(query_vector, k)
+
     print("distances:", distances)  # The distance to the nearest neighbor
     print("indices:", indices)  # The index of the nearest neighbor
+
     results = []
     for idx, distance in zip(indices[0], distances[0]):
         if idx != -1 and idx < len(metadata_list):
@@ -194,39 +214,34 @@ def query_index(
 
 
 def run(repo_directory: str):
-    # documents = []
-    # process_repo(repo_directory, documents)
 
-    # Split the sample document.
-    # doc_chunks = [
-    # split_document(doc, chunk_size=10, overlap=5) for doc in tqdm(documents)
-    # ]
+    documents = []
+    process_repo(repo_directory, documents)
 
-    # Generate embeddings for each chunk.
-    # embedded_chunks = []
-    # for chunks in tqdm(doc_chunks):
-    #     embedded_chunks.extend(embed_chunks(client, chunks))
+    doc_chunks = [
+        split_document(doc, chunk_size=10, overlap=5) for doc in tqdm(documents)
+    ]
 
-    # np.save(ROOT_DIR / "data/embedded_chunks.npy", embedded_chunks, allow_pickle=True)
-    embedded_chunks = np.load(
-        ROOT_DIR / "data/embedded_chunks.npy", allow_pickle=True
-    ).tolist()
+    embedded_chunks = []
+    for chunks in tqdm(doc_chunks):
+        embedded_chunks.extend(embed_chunks(client, chunks))
+
+    print(f"Loaded {len(embedded_chunks)} embedded chunks.")
     embedded_chunks = [
         chunks for chunks in embedded_chunks if len(chunks["embedding"]) != 0
     ]
-    print(f"Loaded {len(embedded_chunks)} embedded chunks.")
+    print(
+        f"Loaded {len(embedded_chunks)} embedded chunks excluding chunks with 0 embeddings."
+    )
 
-    # Create the FAISS index with embedded chunks.
     start_time = time.time()
     index, metadata_list = create_faiss_index(embedded_chunks)
     end_time = time.time()
-    print(f"Indexing took {end_time - start_time:.2f} seconds.")
-    # np.save(ROOT_DIR / "data/faiss_index.npy", index, allow_pickle=True)
+    print(f"Faiss Index creation took {end_time - start_time:.2f} seconds.")
+
     faiss.write_index(index, str(ROOT_DIR / "data/faiss_index.index"))
     np.save(ROOT_DIR / "data/metadata_list.npy", metadata_list, allow_pickle=True)
 
 
 if __name__ == "__main__":
     run(ROOT_DIR / REPO_FOLDER_NAME)
-
-# Here you can proceed to further steps, such as splitting documents into chunks and embedding them.
