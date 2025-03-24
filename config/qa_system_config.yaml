@@ -1,5 +1,0 @@
-
-embedding:
-  model: 'text-embedding-ada-002'
-database:
-  vector: 'FAISS'
