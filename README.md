@@ -46,6 +46,16 @@ docker run \
   codeinsightqa
 ```
 
+Example for running the container:
+```bash
+docker run \
+  --env AZURE_OPENAI_API_KEY=1234567890 \
+  --env endpoint=https://<yourgpt>.openai.azure.com/ \
+  --env api_version=2024-05-01-preview \
+  -p 8000:8000 \
+  codeinsightqa
+```
+
 ### 3. Verify the Application Is Running:
 Once the container starts, you should see log output indicating that Uvicorn has launched the FastAPI server on 0.0.0.0:8000.
 
@@ -163,3 +173,32 @@ For generating embeddings from code and documentation text, CodeInsightQA utiliz
 
 - **Performance Considerations:**  
   With a manageable dimensionality (reduced dimension is 1024), the embeddings are rich enough for effective similarity search, while remaining efficient in terms of storage and computation.
+
+
+## Future Enhancements and Optimizations
+
+While CodeInsightQA currently implements the core functionality in a procedural manner, there are several areas for future improvement:
+
+1. **Adopting a Class-Based Architecture:**  
+   - **Modularity & Maintainability:**  
+     Refactor the codebase into classes that encapsulate distinct responsibilities. For example:
+     - A `RepositoryIndexer` class to traverse, process, and chunk repository files.
+     - An `EmbeddingGenerator` class to handle interaction with the embedding API.
+     - A `VectorStore` class to abstract FAISS index creation, query, and persistence.
+     - An `LLMWrapper` class to manage prompt construction and communication with the LLM.
+   - **Benefits:**  
+     A class-based approach improves code modularity, eases testing and debugging, and allows for more flexible extensions in the future.
+
+2. **Optimizing LLM Answer Quality:**  
+   - **Prompt Engineering:**  
+     Experiment with different system and user prompt formulations to provide clearer context and guidance, which may lead to more accurate and consistent answers.
+   - **Dynamic Parameter Tuning:**  
+     Implement mechanisms to dynamically adjust parameters such as `max_tokens` and `temperature` based on the complexity of the question or the length of the contextual input.
+   - **Multi-Round Querying:**  
+     Consider using iterative or multi-turn conversation strategies where the response is refined over multiple rounds. For example:
+     - First fetch and display the most relevant context.
+     - Then allow the user to indicate if more detail is needed or to clarify the question.
+   - **Feedback Loop:**  
+     Integrate a feedback mechanism where users can rate answer quality. This feedback can be used to further refine prompt templates or select alternative LLM configurations.
+   - **Caching:**  
+     Cache embeddings for frequently asked questions and previously indexed repository chunks to improve response times while ensuring answers are up-to-date.
