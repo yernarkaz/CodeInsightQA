@@ -1,5 +1,0 @@
-similarity_search:
-  threshold: 0.8
-  
-out_of_scope:
-  prompt: "Is the following code snippet out of scope for the given task?"

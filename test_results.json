@@ -1,0 +1,114 @@
+[
+    {
+        "q": "what is the capital of France?",
+        "response": {
+            "answer": "Out-of-the-scope",
+            "index_time": 0.9824240207672119,
+            "llm_time": 0
+        }
+    },
+    {
+        "q": "how can i create a chromadb rag?",
+        "response": {
+            "answer": "The repository provided does not contain any direct references to creating a \"ChromaDB RAG\". RAG typically stands for Retrieval-Augmented Generation, which is a method used in natural language processing to augment a generative model with a retrieval component. However, the repository does not seem to include explicit instructions or methods for creating a RAG using ChromaDB.\n\nIf you are looking to interact with ChromaDB in some way, you might want to look at the `ChromaDB_VectorStore` class in the `chromadb_vector.py` file, which provides methods such as `generate_embedding`, `add_question_sql`, `add_ddl`, `add_documentation`, `get_similar_question_sql`, `get_related_ddl`, and `get_related_documentation`. These methods suggest functionality related to storing and retrieving information, which could potentially be part of a RAG system, but there is no clear indication of a RAG setup in the provided repository context.\n\nFor more specific functionality or instructions, you would need to refer to the documentation or source code of the repository, which is not fully provided in the context here. If you are looking for how to create a RAG using ChromaDB specifically, I would recommend checking the repository's documentation or reaching out to the maintainers for guidance.\n\nFor reference, here is the link to the `ChromaDB_VectorStore` class in the repository:\n- [`chromadb_vector.py`](https://github.com/vanna-ai/vanna/blob/main/src/vanna/chromadb/chromadb_vector.py) (Lines 26-35)\n\nAnd here is the structure of the `ChromaDB_VectorStore` subgraph as defined in the repository:\n- [`base.py`](https://github.com/vanna-ai/vanna/blob/main/src/vanna/base/base.py) (Lines 36-45)\n\nIf you need assistance with a specific method or functionality within the scope of the repository, please provide more details or ask a more specific question.",
+            "index_time": 0.24,
+            "llm_time": 10.73
+        }
+    },
+    {
+        "q": "what is the difference between chromadb and qdrant?",
+        "response": {
+            "answer": "ChromaDB and Qdrant are both components within the Vanna project, but they serve different purposes and are implemented differently.\n\nChromaDB is a module within the Vanna project that appears to be related to vector storage, as indicated by the file `chromadb_vector.py`. The `ChromaDB_VectorStore` class is likely responsible for operations related to storing and retrieving vector representations of data, which can be used for similarity search or other machine learning tasks. The specific functionalities of `ChromaDB_VectorStore` can be inferred from the subgraph in the `base.py` file, which includes methods like `generate_embedding`, `add_question_sql`, `add_ddl`, `add_documentation`, `get_similar_question_sql`, `get_related_ddl`, and `get_related_documentation`. These methods suggest that ChromaDB deals with embedding generation and retrieval of similar SQL queries, DDL, and documentation based on vector similarity.\n\n- ChromaDB_VectorStore: [src/vanna/chromadb/__init__.py (Line 1)](https://github.com/vanna-ai/vanna/blob/main/src/vanna/chromadb/__init__.py#L1)\n- ChromaDB_VectorStore functionalities: [src/vanna/base/base.py (Lines 36-45)](https://github.com/vanna-ai/vanna/blob/main/src/vanna/base/base.py#L36-L45)\n\nQdrant, on the other hand, is a vector search engine that is used within the Vanna project as a client for storing and querying vector data. In the test file `test_vanna.py`, a `QdrantClient` is instantiated with an in-memory configuration and connected to a SQLite database. The `VannaQdrant` class is then used to interact with Qdrant, running SQL queries and training on DDL statements. This suggests that Qdrant is used within Vanna to facilitate the vector search capabilities, possibly leveraging Qdrant's indexing and search features for efficient retrieval of similar items based on vector similarity.\n\n- QdrantClient usage: [tests/test_vanna.py (Lines 71-80)](https://github.com/vanna-ai/vanna/blob/main/tests/test_vanna.py#L71-L80)\n\nIn summary, ChromaDB seems to be a custom module within Vanna for handling vector data, while Qdrant is an external vector search engine integrated into Vanna for vector search capabilities.",
+            "index_time": 0.3,
+            "llm_time": 14.6
+        }
+    },
+    {
+        "q": "how does should_generate_chart function from vanna base works?",
+        "response": {
+            "answer": "Out-of-the-scope",
+            "index_time": 0.26,
+            "llm_time": 0.77
+        }
+    },
+    {
+        "q": "What context strategy improved SQL accuracy the most?",
+        "response": {
+            "answer": "The context strategy that improved SQL accuracy the most was the one where schema definitions, documentation, and prior SQL queries were combined with a relevance search. This approach led to an increase in accuracy from approximately 3% to around 80%. This strategy is highlighted as the clear winner in the paper \"AI SQL Accuracy: Testing different LLMs + context strategies to maximize SQL generation accuracy.\" [Lines 6-15](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L6-L15)",
+            "index_time": 0.24,
+            "llm_time": 3.98
+        }
+    },
+    {
+        "q": "How did GPT-4 and Bison compare in SQL generation?",
+        "response": {
+            "answer": "GPT-4 and Bison were compared in SQL generation based on their performance across different context strategies. According to the paper, GPT 4 was found to be the best overall LLM for generating SQL, taking the crown when averaged across the three strategies. Bison, on the other hand, started out at the bottom of the heap when using just the Schema and Static context strategies. However, Bison showed a significant improvement and rocketed to the top with a full Contextual strategy, becoming roughly equivalent to GPT 4 when enough context was provided ([Lines 246-255](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L246-L255), [Lines 6-15](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L6-L15)).",
+            "index_time": 0.3,
+            "llm_time": 6.53
+        }
+    },
+    {
+        "q": "How does the system help business users get SQL answers?",
+        "response": {
+            "answer": "The system described in the repository aims to help business users get SQL answers by using generative AI, specifically Large Language Models (LLMs), to translate plain English queries into SQL. This allows business users who may not have advanced SQL knowledge or a comprehensive understanding of their organization's unique data structure and schema to query the database directly. The AI acts as an intermediary, generating the SQL code necessary to retrieve the data they need to inform business decisions and strategy.\n\nThe key challenge addressed by the system is generating accurate SQL for complex and messy databases. While some have tried using tools like ChatGPT with limited success, the approach discussed in the repository involves providing the AI with example queries to improve the accuracy of the generated SQL. By including a few example queries in the context window, the AI can learn how to query the database correctly, taking into account the intricacies of the dataset.\n\nThis process is intended to alleviate the pain points experienced by both business users, who face long lead times to get answers, and data analysts, who are distracted from their main projects by ad hoc data requests. By enabling business users to generate their own SQL queries through AI, the system aims to streamline the data querying process and unlock potential insights that might otherwise be lost.\n\nFor more details, you can refer to the following sections in the repository:\n- The explanation of the problem faced by business users and analysts is detailed in lines 41-50 of the file [ai-sql-accuracy-2023-08-17.md](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md).\n- The introduction of generative AI as a solution and the challenges involved are discussed in lines 46-55 of the same file [ai-sql-accuracy-2023-08-17.md](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md).\n- The use of SQL examples to improve AI-generated SQL accuracy is covered in lines 216-225 of the file [ai-sql-accuracy-2023-08-17.md](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md).",
+            "index_time": 0.24,
+            "llm_time": 14.12
+        }
+    },
+    {
+        "q": "Why is SQL generation by AI useful?",
+        "response": {
+            "answer": "SQL generation by AI is useful because it addresses the challenge that many organizations face: a vast amount of data stored in data warehouses or data lakes that is brimming with potential insights, yet only a small fraction of people within an enterprise possess the necessary skills to harness this data. These skills include:\n\n1. A solid comprehension of advanced SQL.\n2. A comprehensive knowledge of the organization’s unique data structure and schema.\n\nThe number of people who have both skills is not only small but also not likely to be the same people who have the majority of the questions that could be answered by analyzing the data. Business users such as product managers, sales managers, and executives often have specific, ad hoc data questions that inform business decisions and strategy. When the answers are not available on dashboards, they must rely on data analysts or engineers to provide the information, which can lead to long lead times and distractions from main projects for the analysts.\n\nGenerative AI, like Large Language Models (LLMs), offers the opportunity for business users to query the database in plain English, with the AI doing the SQL translation. This could be a game-changer for data teams and businesses, as it would democratize access to data insights and streamline the process of data querying, potentially leading to more insights being discovered and utilized.\n\nHowever, the key challenge is generating accurate SQL for complex and messy databases. While some have tried using AI models like ChatGPT with limited success, the promise of AI in this space is to provide a more efficient and accessible way for a broader range of users to interact with and extract value from their organization's data.\n\nReferences:\n- [Why use AI to generate SQL?](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#why-use-ai-to-generate-sql) (Lines 36-45)\n- [The process and challenges in organizations](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#so-what-actually-happens-inside-organizations) (Lines 46-55)",
+            "index_time": 0.27,
+            "llm_time": 15.92
+        }
+    },
+    {
+        "q": "What are the key skills needed to query data warehouses?",
+        "response": {
+            "answer": "The key skills needed to query data warehouses are:\n\n1. A solid comprehension of **advanced SQL**.\n2. A comprehensive knowledge of the **organization’s unique data structure & schema**.\n\nThese skills are outlined in the repository file [ai-sql-accuracy-2023-08-17.md](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md) on lines [36-45](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L36-L45) and [41-50](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L41-L50).",
+            "index_time": 0.28,
+            "llm_time": 5.83
+        }
+    },
+    {
+        "q": "What problem do business users face with data access?",
+        "response": {
+            "answer": "Business users, such as product managers, sales managers, and executives, face the problem of having data questions that inform business decisions and strategy but not having immediate access to the answers. They often lack the necessary skills to query the data themselves, which include:\n\n1. A solid comprehension of **advanced SQL**, and\n2. A comprehensive knowledge of the **organization’s unique data structure & schema**.\n\nSince only a small number of people within an organization possess both skills, business users typically have to rely on data analysts or engineers to get the information they need. This leads to a painful process with long lead times for getting answers, which distracts analysts from their main projects and can result in many potential insights being lost. The process is further complicated by the fact that once an answer is provided, business users often have follow-up questions, adding to the delay and inefficiency of the process. ([Lines 41-50](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L41-L50))",
+            "index_time": 3.81,
+            "llm_time": 6.74
+        }
+    },
+    {
+        "q": "Which LLM was considered the best for SQL?",
+        "response": {
+            "answer": "According to the content provided, **GPT 4 takes the crown as the best LLM for SQL generation**. This information is found in the repository file [ai-sql-accuracy-2023-08-17.md](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md) on lines 251-260.",
+            "index_time": 0.24,
+            "llm_time": 4.47
+        }
+    },
+    {
+        "q": "What was the accuracy increase with proper context?",
+        "response": {
+            "answer": "The accuracy increase with proper context was from approximately 3% to 80%. This is highlighted in the paper where it states, \"We go from ~3% accurate using just the schema, to ~80% accurate when intelligently using contextual examples.\" ([AI SQL Accuracy: Testing different LLMs + context strategies to maximize SQL generation accuracy](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md), Lines 246-255).",
+            "index_time": 0.24,
+            "llm_time": 3.55
+        }
+    },
+    {
+        "q": "What data is included in the optimal context strategy?",
+        "response": {
+            "answer": "The optimal context strategy, as mentioned in the repository, involves using \"contextually relevant examples.\" This means including the most relevant context, such as SQL queries, DDL (Data Definition Language), or documentation, in the context window. The relevant context is found via a vector search based on embeddings, which helps to provide the LLM with the most pertinent information for generating accurate SQL queries.\n\nRefer to the content in the file `ai-sql-accuracy-2023-08-17.md` on lines [131-140](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L131-L140) for more details on the context strategies.",
+            "index_time": 0.25,
+            "llm_time": 6.5
+        }
+    },
+    {
+        "q": "What was the main limitation of using ChatGPT without context?",
+        "response": {
+            "answer": "The main limitation of using ChatGPT without context was its lack of knowledge of the particular dataset it was being asked to query. This resulted in a low accuracy rate when generating SQL, primarily due to the absence of specific information about the database schema, documentation, and prior SQL queries that could guide the language model in creating accurate SQL statements. The paper emphasizes that context is crucial and that with the right context, accuracy can be significantly improved from around 3% to approximately 80%. ([Lines 6-15](https://github.com/vanna-ai/vanna/blob/main/papers/ai-sql-accuracy-2023-08-17.md#L6-L15))",
+            "index_time": 0.24,
+            "llm_time": 4.67
+        }
+    }
+]
