@@ -1,0 +1,50 @@
+repo:
+  url: 'https://github.com/vanna-ai/vanna/blob/main/'
+  branch: 'master'
+  folder_name: 'vanna'
+files:
+  extensions:
+    - '.py'
+    - '.ipynb'
+    - '.md'
+    - '.txt'
+    - '.rst'
+    - '.json'
+    - '.yaml'
+    - '.yml'
+    - '.toml'
+  ignored_dirs:
+    - '.git'
+    - '.ipynb_checkpoints'
+    - '__pycache__'
+    - '.vscode'
+    - '.idea'
+    - '.github'
+    - 'venv'
+    - 'env'
+    - 'logs'
+    - 'data'
+    - 'img'
+    - 'images'
+    - 'assets'
+    - 'output'
+
+llm_endpoint_type: "azure" # "openai" or "azure"
+
+llm_api_key:
+  openai: "OPENAI_API_KEY"
+  azure: "AZURE_OPENAI_API_KEY"
+
+llm_azure:
+  endpoint: "https://ivantistridegpt.openai.azure.com/"
+  deployment: "gpt-4"
+  api_version: "2024-05-01-preview"
+
+similarity_search:
+  distance_threshold: 1.2 
+  top_k: 5
+
+embedding:
+  model: 'text-embedding-3-large'
+  max_tokens: 4096
+  temperature: 0.2
