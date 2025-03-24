@@ -12,9 +12,7 @@ import time
 import utils
 
 
-ROOT_DIR = Path(__file__).parent.parent.parent
-config = utils.read_yaml_file(ROOT_DIR / "config/indexing_config.yaml")
-
+config = utils.read_yaml_file("config/indexing_config.yaml")
 
 REPO_FOLDER_NAME = config["repo"]["folder_name"]
 GITHUB_REPO_BASE = config["repo"]["url"]
