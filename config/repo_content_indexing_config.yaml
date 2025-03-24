@@ -1,0 +1,31 @@
+repo:
+  url: 'https://github.com/vanna-ai/vanna/blob/main/'
+  branch: 'master'
+  folder_name: 'vanna'
+files:
+  extensions:
+    - '.py'
+    - '.ipynb'
+    - '.md'
+    - '.txt'
+    - '.rst'
+    - '.json'
+    - '.yaml'
+    - '.yml'
+    - '.toml'
+  ignored_dirs:
+    - '.git'
+    - '.ipynb_checkpoints'
+    - '__pycache__'
+    - '.vscode'
+    - '.idea'
+    - '.github'
+    - 'venv'
+    - 'env'
+    - 'logs'
+    - 'data'
+    - 'img'
+    - 'images'
+    - 'assets'
+    - 'output'
+
