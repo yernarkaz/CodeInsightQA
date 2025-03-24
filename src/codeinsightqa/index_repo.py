@@ -11,22 +11,23 @@ import time
 
 import utils
 
-
+# Load config
 config = utils.read_yaml_file("config/indexing_config.yaml")
 
+# Set up paths and constants
 REPO_FOLDER_NAME = config["repo"]["folder_name"]
 GITHUB_REPO_BASE = config["repo"]["url"]
 ALLOWED_EXTENSIONS = config["files"]["extensions"]
 IGNORED_DIRS = config["files"]["ignored_dirs"]
 
-
+# Load Azure/OpenAI client
 ENDPOINT = config["llm_azure"]["endpoint"]
 DEPLOYMENT = config["llm_azure"]["deployment"]
 SUBSCRIPTION_KEY = os.getenv(config["llm_api_key"][config["llm_endpoint_type"]])
 API_VERSION = config["llm_azure"]["api_version"]
 EMBEDDING_MODEL = config["embedding"]["model"]
 
-
+# Initialize OpenAI client
 if config["llm_endpoint_type"] == "azure":
     client = AzureOpenAI(
         azure_endpoint=ENDPOINT,
@@ -39,10 +40,12 @@ elif config["llm_endpoint_type"] == "openai":
 
 
 def is_text_file(file_path: Path) -> bool:
+    """Check if a file is a text file based on its extension."""
     return file_path.suffix.lower() in ALLOWED_EXTENSIONS
 
 
 def traverse_repo(repo_dir: Path):
+    """Traverse the repository directory and return a list of relevant files."""
 
     relevant_files = []
     for root, dirs, files in os.walk(repo_dir):
@@ -58,6 +61,8 @@ def traverse_repo(repo_dir: Path):
 
 
 def process_file(file_path: Path):
+    """Read the content of a file and return it as a string."""
+
     try:
         with open(file_path, "r", encoding="utf-8") as f:
             content = f.read()
@@ -68,6 +73,7 @@ def process_file(file_path: Path):
 
 
 def process_repo(repo_directory: str, documents: list):
+    """Process the repository directory and extract relevant information."""
 
     repo_dir = Path(repo_directory).resolve()
     if not repo_dir.is_dir():
@@ -94,11 +100,14 @@ def process_repo(repo_directory: str, documents: list):
 
 
 def build_github_url(file_path: str) -> str:
+    """Build a GitHub URL for a given file path."""
+
     file_path = file_path.lstrip("/")
     return os.path.join(GITHUB_REPO_BASE, file_path)
 
 
 def split_document(document: Dict, chunk_size: int, overlap: int) -> List[Dict]:
+    """Split a document into chunks of text with overlap."""
 
     chunks = []
     lines = document["content"].splitlines()
@@ -131,6 +140,7 @@ def split_document(document: Dict, chunk_size: int, overlap: int) -> List[Dict]:
 
 
 def get_embedding(client: OpenAI, text: str) -> List[float]:
+    """Generate an embedding for a given text using the OpenAI API."""
 
     try:
         response = client.embeddings.create(
@@ -143,6 +153,7 @@ def get_embedding(client: OpenAI, text: str) -> List[float]:
 
 
 def embed_chunks(client: OpenAI, chunks: List[Dict]) -> List[Dict]:
+    """Embed a list of text chunks using the OpenAI API."""
 
     for chunk in tqdm(chunks):
         text_to_embed = chunk.get("chunk_text", "")
@@ -157,6 +168,7 @@ def embed_chunks(client: OpenAI, chunks: List[Dict]) -> List[Dict]:
 def create_faiss_index(
     embedded_chunks: List[Dict],
 ) -> Tuple[faiss.IndexFlatL2, List[Dict]]:
+    """Create a Faiss index for a list of embedded chunks."""
 
     if not embedded_chunks:
         raise ValueError("No embedded chunks to index.")
@@ -194,6 +206,7 @@ def query_index(
     query_embedding: List[float],
     k: int = 1,
 ) -> List[Dict]:
+    """Query a Faiss index with a given query embedding and return the top-k results."""
 
     query_vector = np.array(query_embedding, dtype="float32").reshape(1, -1)
     distances, indices = index.search(query_vector, k)
@@ -212,6 +225,7 @@ def query_index(
 
 
 def run(repo_directory: str):
+    """Run the indexing pipeline on a given repository directory."""
 
     documents = []
     process_repo(repo_directory, documents)
@@ -237,9 +251,10 @@ def run(repo_directory: str):
     end_time = time.time()
     print(f"Faiss Index creation took {end_time - start_time:.2f} seconds.")
 
-    faiss.write_index(index, str(ROOT_DIR / "data/faiss_index.index"))
-    np.save(ROOT_DIR / "data/metadata_list.npy", metadata_list, allow_pickle=True)
+    faiss.write_index(index, str("data/faiss_index.index"))
+    np.save("data/metadata_list.npy", metadata_list, allow_pickle=True)
 
 
 if __name__ == "__main__":
-    run(ROOT_DIR / REPO_FOLDER_NAME)
+    # Run the indexing pipeline on the repository directory
+    run(REPO_FOLDER_NAME)

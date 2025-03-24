@@ -14,26 +14,31 @@ from pydantic import BaseModel
 from typing import Tuple
 
 
+# Load the configuration file.
 config = utils.read_yaml_file("config/indexing_config.yaml")
 
 
+# Load the environment variables or use the default values from the configuration file.
 ENDPOINT = os.getenv("endpoint", config["llm_azure"]["endpoint"])
 DEPLOYMENT = os.getenv("deployment", config["llm_azure"]["deployment"])
 SUBSCRIPTION_KEY = os.getenv(config["llm_api_key"][config["llm_endpoint_type"]])
 API_VERSION = os.getenv("api_version", config["llm_azure"]["api_version"])
 
 
+# Load the configuration parameters.
 TOP_K = config["similarity_search"]["top_k"]
 SIMILARITY_THRESHOLD = config["similarity_search"]["distance_threshold"]
 MAX_TOKENS = config["embedding"]["max_tokens"]
 TEMPERATURE = config["embedding"]["temperature"]
 
 
+# Load the Faiss index and metadata list.
 index = faiss.read_index("data/faiss_index.index")
 metadata_list = np.load("data/metadata_list.npy", allow_pickle=True).tolist()
 print("Index loaded successfully.", type(index))
 
 
+# Define the Pydantic models for the request and response.
 class QueryRequest(BaseModel):
     question: str
 
@@ -44,6 +49,7 @@ class QueryResponse(BaseModel):
     llm_time: float = 0.0
 
 
+# Initialize the OpenAI client based on the endpoint type.
 if config["llm_endpoint_type"] == "azure":
     client = AzureOpenAI(
         azure_endpoint=ENDPOINT,
@@ -54,16 +60,21 @@ elif config["llm_endpoint_type"] == "openai":
     client = OpenAI(api_key=SUBSCRIPTION_KEY)
 
 
+# Initialize the FastAPI app.
 app = FastAPI(title="CodeInsightQA API")
 
 
+# Define the health check endpoint.
 @app.get("/health")
 def health_check():
     return {"status": "OK", "message": "CodeInsightQA API is running."}
 
 
+# Define the endpoint to ask a question.
 @app.post("/ask", response_model=QueryResponse)
 async def ask_question(query: QueryRequest):
+    # Use the global variables for the Faiss index and metadata list.
+
     global index, metadata_list
 
     question = query.question
@@ -79,6 +90,7 @@ async def ask_question(query: QueryRequest):
     print(retrieved_chunks[0])
 
     # Check the similarity of the top result.
+    # the list is sorted by similarity, so we only need to check the first element.
     if not retrieved_chunks or retrieved_chunks[0]["distance"] > SIMILARITY_THRESHOLD:
         total_time = time.time() - overall_start
         return QueryResponse(answer="Out-of-the-scope", index_time=total_time)
@@ -92,6 +104,8 @@ async def ask_question(query: QueryRequest):
 
 
 def generate_answer(question: str, context_chunks: list) -> Tuple[str, float]:
+    # Generate the answer using the LLM model.
+    # The context_chunks contain the relevant information from the repository.
 
     context_text = "\n\n".join(
         [
@@ -104,6 +118,7 @@ def generate_answer(question: str, context_chunks: list) -> Tuple[str, float]:
         ]
     )
 
+    # Define the system and user prompts for the LLM model.
     system_prompt = (
         "You are an assistant that only answers questions using the repository information provided. "
         "If the question is not related to the content below, reply with 'Out-of-the-scope'. "
@@ -112,6 +127,7 @@ def generate_answer(question: str, context_chunks: list) -> Tuple[str, float]:
 
     user_prompt = f"Repository Context:\n{context_text}\n\nQuestion: {question}"
 
+    # Generate the answer using the LLM model.
     start_llm = time.time()
     try:
         completion = client.chat.completions.create(
@@ -132,5 +148,5 @@ def generate_answer(question: str, context_chunks: list) -> Tuple[str, float]:
 
 
 if __name__ == "__main__":
-    # Run the FastAPI app.
+    # Run the FastAPI app using Uvicorn.
     uvicorn.run(app, host="0.0.0.0", port=8000)
